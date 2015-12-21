@@ -4,6 +4,7 @@
   var MiniJavaLexer = require('grammar/MiniJavaLexer.js');
   var MiniJavaParser = require('grammar/MiniJavaParser.js');
   var BuildListener = require('core/BuildListener.js');
+  var CheckListener = require('core/CheckListener.js');
   var ErrorHandler = require('core/ErrorHandler.js');
   var Scope = require('core/Scope.js');
   window.onload = function () {
@@ -27,7 +28,9 @@
     parser.buildParseTrees = true;
     var tree = parser.translationUnit();
     var buildListener = new BuildListener.BuildListener();
+    var checkListener = new CheckListener.CheckListener();
     antlr4.tree.ParseTreeWalker.DEFAULT.walk(buildListener, tree);
+    antlr4.tree.ParseTreeWalker.DEFAULT.walk(checkListener, tree);
     console.log(ErrorHandler.ErrorHandler.getErrors());
   };
 })();
