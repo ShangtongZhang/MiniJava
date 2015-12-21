@@ -1,9 +1,11 @@
 (function () {
-  antlr4 = require('antlr4/index');
-  MiniJavaLexer = require('grammar/MiniJavaLexer.js');
-  MiniJavaParser = require('grammar/MiniJavaParser.js');
-  MiniJavaListener = require('grammar/MiniJavaListener.js');
-  MiniJavaVisitor = require('grammar/MiniJavaVisitor.js');
+  'use strict';
+  var antlr4 = require('antlr4/index');
+  var MiniJavaLexer = require('grammar/MiniJavaLexer.js');
+  var MiniJavaParser = require('grammar/MiniJavaParser.js');
+  var BuildListener = require('core/BuildListener.js');
+  var ErrorHandler = require('core/ErrorHandler.js');
+  var Scope = require('core/Scope.js');
   window.onload = function () {
     var upfile = document.querySelector('#upfile');
     $('#upfile').change(function () {
@@ -24,6 +26,8 @@
     var parser = new MiniJavaParser.MiniJavaParser(tokens);
     parser.buildParseTrees = true;
     var tree = parser.translationUnit();
+    var buildListener = new BuildListener.BuildListener();
+    antlr4.tree.ParseTreeWalker.DEFAULT.walk(buildListener, tree);
+    console.log(ErrorHandler.ErrorHandler.getErrors());
   };
-
 })();
