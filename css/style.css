@@ -10,19 +10,19 @@ h3.center {
 }
 
 div.upload {
-    margin-top: 3rem;
-    margin-left: auto;
-    margin-right: auto;
-    width: 157px;
-    height: 57px;
-    background: url(/img/upload.png);
-    overflow: hidden;
+  margin-top: 3rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: 157px;
+  height: 57px;
+  background: url(../img/upload.png);
+  overflow: hidden;
 }
 
 div.upload input {
-    display: block;
-    width: 157px;
-    height: 57px;
-    opacity: 0;
-    overflow: hidden;
+  display: block;
+  width: 157px;
+  height: 57px;
+  opacity: 0;
+  overflow: hidden;
 }
