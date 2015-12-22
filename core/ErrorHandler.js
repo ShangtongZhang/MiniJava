@@ -6,10 +6,10 @@
     this.msg = msg;
   }
   var ErrorHandler = {};
-  var errors = [];
+  ErrorHandler.errors = [];
   ErrorHandler.addRedefinition = function (token, type, id) {
     var msg = type + ' ' + id + ' is already defined';
-    errors.push(new ErrorInfo(token.line, token.column, msg));
+    this.errors.push(new ErrorInfo(token.line, token.column, msg));
   };
   ErrorHandler.addUndefinition = function (token, type, id) {
     var msg = type + ' ' + id + ' has not been defined';
@@ -32,7 +32,7 @@
     errors.push(new ErrorInfo(token.line, token.column, msg));
   }
   ErrorHandler.getErrors = function () {
-    return errors;
+    return this.errors;
   };
   exports.ErrorHandler = ErrorHandler;
 })();

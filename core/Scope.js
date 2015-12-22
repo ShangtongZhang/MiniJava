@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var Utils = require('core/utils.js');
+  var Utils = require('core/Utils.js');
 
   function Scope(name, parent) {
     this.name = name;
