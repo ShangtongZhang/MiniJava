@@ -21,7 +21,7 @@
     parser.buildParseTrees = true;
     var tree = parser.translationUnit();
     var buildListener = new BuildListener.BuildListener();
-    var checkListener = new CheckListener.CheckListener();
+    var checkListener = new CheckListener.CheckListener(buildListener.scopes, buildListener.outerScope);
     antlr4.tree.ParseTreeWalker.DEFAULT.walk(buildListener, tree);
     antlr4.tree.ParseTreeWalker.DEFAULT.walk(checkListener, tree);
     this.parseTree = tree;

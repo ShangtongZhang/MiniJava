@@ -9,11 +9,11 @@
   var INVALID = "__INVALID";
   var UNCERTAIN = "__UNCERTAIN";
 
-  function CheckListener() {
+  function CheckListener(scopes, outerScope) {
     MiniJavaListener.MiniJavaListener.apply(this, arguments);
-    this.outerScope = new Scope.BlockScope(null);
+    this.outerScope = outerScope;
     this.currentScope = this.outerScope;
-    this.scopes = {};
+    this.scopes = scopes;
     return this;
   }
   CheckListener.prototype = Object.create(MiniJavaListener.MiniJavaListener.prototype);
@@ -29,11 +29,7 @@
         ErrorHandler.ErrorHandler.addWrongGenre(ctx.IDENTIFIER(1).getSymbol(), "class", scope.genre, identifierName);
       }
     }
-    var className = ctx.IDENTIFIER(0).getText();
-    var classScope = new Scope.ClassScope(className, this.currentScope);
-    this.currentScope.define(classScope);
-    this.currentScope = classScope;
-    this.scopes[ctx] = classScope;
+    this.currentScope = this.scopes[ctx];
   };
 
   CheckListener.prototype.exitClassDeclaration = function(ctx) {
@@ -41,13 +37,7 @@
   };
 
   CheckListener.prototype.enterMainMethod = function(ctx) {
-    //this.currentScope = this.scopes[ctx];
-    var mainMethodName = 'main';
-    var methodScope = new Scope.MethodScope('void', mainMethodName, this.currentScope);
-    methodScope.addParameterType('String[]');
-    this.currentScope.define(methodScope);
-    this.scopes[ctx] = methodScope;
-    this.currentScope = methodScope;
+    this.currentScope = this.scopes[ctx];
   };
 
   CheckListener.prototype.exitMainMethod = function(ctx) {
@@ -55,12 +45,7 @@
   };
 
   CheckListener.prototype.enterMethod = function(ctx) {
-    //this.currentScope = this.scopes[ctx];
-    var methodName = ctx.IDENTIFIER().getText();
-    var methodScope = new Scope.MethodScope(ctx.type().getText(), methodName, this.currentScope);
-    this.currentScope.define(methodScope);
-    this.currentScope = methodScope;
-    this.scopes[ctx] = methodScope;
+    this.currentScope = this.scopes[ctx];
   };
 
   CheckListener.prototype.exitMethod = function(ctx) {
@@ -68,10 +53,7 @@
   };
 
   CheckListener.prototype.enterBlock = function(ctx) {
-    //this.currentScope = this.scopes[ctx];
-    var blockScope = new Scope.BlockScope(this.currentScope);
-    this.scopes[ctx] = blockScope;
-    this.currentScope = blockScope;
+    this.currentScope = this.scopes[ctx];
   };
 
   CheckListener.prototype.exitBlock = function(ctx) {
@@ -80,19 +62,19 @@
 
   CheckListener.prototype.enterPrimaryExpression = function(ctx) {
     if (ctx.IDENTIFIER() !== null) {
-      var identifierName = ctx.IDENTIFIER().getText();
+      var identifierName = ctx.IDENTIFIER(0).getText();
       var scope = this.currentScope.resolve(identifierName);
       if (ctx.getChildCount() > 1) {
         if (scope === null) {
-          ErrorHandler.ErrorHandler.addUndefinition(ctx.IDENTIFIER().getSymbol(), "method", identifierName);
+          ErrorHandler.ErrorHandler.addUndefinition(ctx.IDENTIFIER(0).getSymbol(), "method", identifierName);
         } else if (scope.genre !== "method") {
-          ErrorHandler.ErrorHandler.addWrongGenre(ctx.IDENTIFIER().getSymbol(), "method", scope.genre, identifierName);
+          ErrorHandler.ErrorHandler.addWrongGenre(ctx.IDENTIFIER(0).getSymbol(), "method", scope.genre, identifierName);
         }
       } else {
         if (scope === null) {
-          ErrorHandler.ErrorHandler.addUndefinition(ctx.IDENTIFIER().getSymbol(), "variable", identifierName);
+          ErrorHandler.ErrorHandler.addUndefinition(ctx.IDENTIFIER(0).getSymbol(), "variable", identifierName);
         } else if (scope.genre !== "variable") {
-          ErrorHandler.ErrorHandler.addWrongGenre(ctx.IDENTIFIER().getSymbol(), "variable", scope.genre, identifierName);
+          ErrorHandler.ErrorHandler.addWrongGenre(ctx.IDENTIFIER(0).getSymbol(), "variable", scope.genre, identifierName);
         }
       }
     }
@@ -119,9 +101,9 @@
     if (ctx.primaryExpression() !== null) {
       type = this.scopes[ctx.primaryExpression()].type;
     } else if (ctx.getChild(0).getText() === "new") {
-      var scope = this.currentScope.resolve(ctx.IDENTIFIER().getText());
+      var scope = this.currentScope.resolve(ctx.IDENTIFIER(0).getText());
       if (scope.genre === "class") {
-        type = scope.getName();
+        type = scope.name;
       }
     } else if (ctx.getChild(0).getText === "-" || ctx.getChild(0).getText() === "!") {
       var expressionScope = this.scopes[ctx.expression(0)];
@@ -130,17 +112,17 @@
           type = "int";
         } else {
           type = INVALID;
-          ErrorHandler.ErrorHandler.addWrongType(ctx.expression(0).getStart(), "int", expressionScope.type, expressionScope.getName());
+          ErrorHandler.ErrorHandler.addWrongType(ctx.expression(0).start, "int", expressionScope.type, expressionScope.name);
         }
       } else {
         if (expressionScope.type === "boolean") {
           type = "boolean";
         } else {
           type = INVALID;
-          ErrorHandler.ErrorHandler.addWrongType(ctx.expression(0).getStart(), "boolean", expressionScope.type, expressionScope.getName());
+          ErrorHandler.ErrorHandler.addWrongType(ctx.expression(0).start, "boolean", expressionScope.type, expressionScope.name);
         }
       }
-    } else if (ctx.getChildCount() === 3 && ctx.expression().size() === 2) {
+    } else if (ctx.getChildCount() === 3 && ctx.expression().length === 2) {
       var expressionScope0 = this.scopes[ctx.expression(0)];
       var expressionScope1 = this.scopes[ctx.expression(1)];
       if (ctx.getChild(1).getText().length === 1) {
@@ -158,10 +140,10 @@
             else {
               type = INVALID;
               if (expressionScope0.type !== "int") {
-                ErrorHandler.ErrorHandler.addWrongType(ctx.expression(0).getStart(), "int", expressionScope0.type, expressionScope0.getName());
+                ErrorHandler.ErrorHandler.addWrongType(ctx.expression(0).start, "int", expressionScope0.type, expressionScope0.name);
               }
               if (expressionScope1.type !== "int") {
-                ErrorHandler.ErrorHandler.addWrongType(ctx.expression(1).getStart(), "int", expressionScope1.type, expressionScope1.getName());
+                ErrorHandler.ErrorHandler.addWrongType(ctx.expression(1).start, "int", expressionScope1.type, expressionScope1.name);
               }
             }
             break;
@@ -170,7 +152,7 @@
               type = expressionScope0.type;
             } else {
               type = INVALID;
-              ErrorHandler.ErrorHandler.addWrongType(ctx.expression(1).getStart(), expressionScope1.type, expressionScope1.getName());
+              ErrorHandler.ErrorHandler.addWrongType(ctx.expression(1).start, expressionScope1.type, expressionScope1.name);
             }
             break;
         }
@@ -182,9 +164,9 @@
           } else {
             type = INVALID;
             if (expressionScope0.type !== "int") {
-              ErrorHandler.ErrorHandler.addWrongType(ctx.expression(0).getStart(), "int", expressionScope0.type, expressionScope0.getName());
+              ErrorHandler.ErrorHandler.addWrongType(ctx.expression(0).start, "int", expressionScope0.type, expressionScope0.name);
             } else if (expressionScope1.type !== "int") {
-              ErrorHandler.ErrorHandler.addWrongType(ctx.expression(1).getStart(), "int", expressionScope1.type, expressionScope1.getName());
+              ErrorHandler.ErrorHandler.addWrongType(ctx.expression(1).start, "int", expressionScope1.type, expressionScope1.name);
             }
           }
         } else if (sign === "==" || sign === "!=") {
@@ -192,7 +174,7 @@
             type = "boolean";
           } else {
             type = INVALID;
-            ErrorHandler.ErrorHandler.addWrongType(ctx.expression(1).getStart(), expressionScope0.type, expressionScope1.type, expressionScope1.getName());
+            ErrorHandler.ErrorHandler.addWrongType(ctx.expression(1).start, expressionScope0.type, expressionScope1.type, expressionScope1.name);
           }
         } else {
           if (expressionScope0.type === "boolean" && expressionScope1.type === "boolean") {
@@ -200,9 +182,10 @@
           } else {
             type = INVALID;
             if (expressionScope0.type !== "boolean") {
-              ErrorHandler.ErrorHandler.addWrongType(ctx.expression(0).getStart(), "boolean", expressionScope0.type, expressionScope0.getName());
-            } else if (expressionScope1.type !== "boolean") {
-              ErrorHandler.ErrorHandler.addWrongType(ctx.expression(1).getStart(), "boolean", expressionScope1.type, expressionScope1.getName());
+              ErrorHandler.ErrorHandler.addWrongType(ctx.expression(0).start, "boolean", expressionScope0.type, expressionScope0.name);
+            }
+            if (expressionScope1.type !== "boolean") {
+              ErrorHandler.ErrorHandler.addWrongType(ctx.expression(1).start, "boolean", expressionScope1.type, expressionScope1.name);
             }
           }
         }
@@ -226,26 +209,26 @@
       } else if (ctx.getChild(0).getSymbol().type == MiniJavaParser.MiniJavaParser.INTEGER) {
         type = "int";
       } else {
-        var scope = this.currentScope.resolve(ctx.IDENTIFIER().getText());
+        var scope = this.currentScope.resolve(ctx.IDENTIFIER(0).getText());
         if (scope !== null && scope.genre === "variable") {
           type = scope.type;
         }
       }
     } else {
-      var scope = this.currentScope.resolve(ctx.IDENTIFIER().getText());
+      var scope = this.currentScope.resolve(ctx.IDENTIFIER(0).getText());
       if (scope !== null && scope.genre === "method") {
         var methodScope = scope;
         type = methodScope.type;
         var paramNum = 0;
         if (ctx.expressionList() !== null) {
-          paramNum = ctx.expressionList().expression().size;
+          paramNum = ctx.expressionList().expression().length;
         }
         if (paramNum !== methodScope.getParameterNum()) {
-          ErrorHandler.ErrorHandler.addWrongParameterNum(ctx.IDENTIFIER().getSymbol(), paramNum, methodScope.getParameterNum(), methodScope.getName());
+          ErrorHandler.ErrorHandler.addWrongParameterNum(ctx.IDENTIFIER().getSymbol(), paramNum, methodScope.getParameterNum(), methodScope.name);
         } else {
           for (var i = 0; i < paramNum; i++) {
             if (!matchType(methodScope.getParameterType(i), this.scopes[ctx.expressionList().expression(i)].type)) {
-              ErrorHandler.ErrorHandler.addWrongType(ctx.expressionList().expression(i).getStart(), methodScope.getParameterType(i), this.scopes[ctx.expressionList().expression(i)].type, ctx.expressionList().expression(i).getText());
+              ErrorHandler.ErrorHandler.addWrongType(ctx.expressionList().expression(i).start, methodScope.getParameterType(i), this.scopes[ctx.expressionList().expression(i)].type, ctx.expressionList().expression(i).getText());
             }
           }
         }
@@ -259,7 +242,7 @@
       var type = this.scopes[ctx.expression()].type;
       if (type !== INVALID && type !== UNCERTAIN) {
         if (!matchType(ctx.type().getText(), type)) {
-          ErrorHandler.ErrorHandler.addWrongType(ctx.expression.getStart(), ctx.type().getText(), type, ctx.expression().getName());
+          ErrorHandler.ErrorHandler.addWrongType(ctx.expression().start, ctx.type().getText(), type, ctx.expression().name);
         }
       }
     }
@@ -271,7 +254,7 @@
       if (type !== INVALID && type !== UNCERTAIN) {
         var def = this.currentScope.getParent("method").type;
         if (!matchType(def, type)) {
-          ErrorHandler.ErrorHandler.addReturnWrongType(ctx.expression().getStart(), def);
+          ErrorHandler.ErrorHandler.addReturnWrongType(ctx.expression().start, def);
         }
       }
     }
@@ -279,11 +262,11 @@
 
   var isIndentifier = function(id) {
     return id !== "this" && id !== "null" && id !== "true" && id !== "false" && id !== "int";
-  }
+  };
 
   var matchType = function(def, type) {
     return def === type || isIndentifier(def) && type === "null" || def === "void" && type === "null";
-  }
+  };
 
   exports.CheckListener = CheckListener;
 
