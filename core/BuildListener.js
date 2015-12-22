@@ -19,7 +19,7 @@
     var className = context.IDENTIFIER(0).getText();
     var classScope = new Scope.ClassScope(className, this.currentScope);
     if (this.currentScope.defined(className)) {
-      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER().getSymbol(), 'class', className);
+      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER(0).getSymbol(), 'class', className);
     }
     this.currentScope.define(classScope);
     this.currentScope = classScope;
@@ -35,7 +35,7 @@
     var methodScope = new Scope.MethodScope('void', mainMethodName, this.currentScope);
     methodScope.addParameterType('String[]');
     if (this.currentScope.defined(mainMethodName)) {
-      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER().getSymbol(), 'main method', mainMethodName);
+      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER(0).getSymbol(), 'main method', mainMethodName);
     }
     this.currentScope.define(methodScope);
     this.scopes[context] = methodScope;
@@ -56,7 +56,7 @@
       });
     }
     if (this.currentScope.defined(methodScope)) {
-      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER().getSymbol(), 'method', methodName);
+      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER(0).getSymbol(), 'method', methodName);
     }
     this.currentScope.define(methodScope);
     this.currentScope = methodScope;
@@ -81,7 +81,7 @@
     var fieldName = context.IDENTIFIER().getText();
     var variableScope = new Scope.VariableScope(context.type().getText(), fieldName, this.currentScope);
     if (this.currentScope.defined(fieldName)) {
-      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER().getSymbol(), 'field', fieldName);
+      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER(0).getSymbol(), 'field', fieldName);
     } else {
       this.currentScope.define(variableScope);
       this.scopes[context] = variableScope;
@@ -92,7 +92,7 @@
     var parameterName = context.IDENTIFIER().getText();
     var variableScope = new Scope.VariableScope(context.type().getText(), parameterName, this.currentScope);
     if (this.currentScope.defined(parameterName)) {
-      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER().getSymbol(), 'parameter', parameterName);
+      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER(0).getSymbol(), 'parameter', parameterName);
     } else {
       this.currentScope.define(variableScope);
       this.scopes[context] = variableScope;
@@ -103,7 +103,7 @@
     var variableName = context.IDENTIFIER().getText();
     var variableScope = new Scope.VariableScope(context.type().getText(), variableName, this.currentScope);
     if (this.currentScope.defined(variableName)) {
-      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER().getSymbol(), 'variable', variableName);
+      ErrorHandler.ErrorHandler.addRedefinition(context.IDENTIFIER(0).getSymbol(), 'variable', variableName);
     } else {
       this.currentScope.define(variableScope);
       this.scopes[context] = variableScope;
