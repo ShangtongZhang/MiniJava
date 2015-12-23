@@ -3,6 +3,7 @@
   var Core = require('core/Core.js');
   window.onload = function () {
     $('#errorInfoContainer').css('visibility', 'hidden');
+    $('#tokensContainer').css('visibility', 'hidden');
     var uploadButton = $('#uploadButton');
     uploadButton.change(function () {
       fileReader.readAsText(uploadButton[0].files[0]);
@@ -18,7 +19,9 @@
           data: [core.renderTree]
         });
         $('#errorInfoContainer').css('visibility', 'visible');
-        $('#errorInfo').html(core.reportErrors());
+        $('#errorInfo').text(core.reportErrors());
+        $('#tokensContainer').css('visibility', 'visible');
+        $('#tokensInfo').text(core.getTokens());
       }
     };
   };

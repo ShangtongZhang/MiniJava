@@ -41,12 +41,20 @@
       msg = "Successfully Compiled!";
     } else {
       $.each(this.errors, function (i, error) {
-        msg += 'Line ' + error.line + ' Column ' + error.column + ':<br></br>';
-        msg += error.msg + '<br></br><br></br>';
+        msg += 'Line ' + error.line + ' Column ' + error.column + ':\n';
+        msg += error.msg + '\n\n';
       });
     }
     this.errors.splice(0);
     return msg;
+  };
+
+  Core.prototype.getTokens = function () {
+    var tokensStr = '';
+    $.each(this.token.tokens, function (i, token) {
+      tokensStr = tokensStr + token.text + '\n';
+    });
+    return tokensStr;
   };
 
   Core.prototype.buildRenderTree = function () {
