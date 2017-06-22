@@ -5,13 +5,13 @@ Lex/Syntax Automation tool: Antlr4
 
 --
 
-##Usage
+## Usage
 
-###Live DEMO
+### Live DEMO
 http://www.slardarzhang.me/MiniJava/
 > Be patient, it may take around 40 seconds to load compeletely within GFW. However, if you browse this webpage outside GFW, you can get perfect experience.
 
-###Local
+### Local
 If want to test this in local environment,
 
 ```
@@ -21,11 +21,11 @@ python -m SimpleHTTPServer
 
 open `localhost:8000/index.html` in your Chrome (only Chrome supported)
 
-##BNF for MiniJava
+## BNF for MiniJava
 
 http://www.cambridge.org/us/features/052182060X/grammar.html#prod2
 
-##Features
+## Features
 
 - Full JavaScript
 - Cross platform
@@ -39,7 +39,7 @@ http://www.cambridge.org/us/features/052182060X/grammar.html#prod2
     4. Wrong parameter number
     5. Wrong return type
 
-##APIs
+## APIs
 
 Inside `./core/Core.js`:
 
